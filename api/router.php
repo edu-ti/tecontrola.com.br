@@ -20,7 +20,6 @@ if (!$action) {
 
 // A configuração da base de dados é necessária para todas as ações
 try {
-    // __DIR__ aponta para a pasta atual (api), /../ volta para a raiz (public_html)
     require_once __DIR__ . '/../db_config.php';
 } catch (PDOException $e) {
     http_response_code(500);
@@ -30,8 +29,8 @@ try {
 }
 
 // Define variáveis globais para serem usadas nos ficheiros incluídos
-$user_id = $_SESSION['user_id'] ?? null;
-$group_id = $_SESSION['group_id'] ?? null;
+$user_id   = $_SESSION['user_id']   ?? null;
+$group_id  = $_SESSION['group_id']  ?? null;
 $user_role = $_SESSION['user_role'] ?? null;
 
 // Roteia a ação para o ficheiro PHP correspondente
@@ -48,29 +47,31 @@ switch ($action) {
     case 'data':
         require 'data.php';
         break;
-        
-    // --- ROTA DO GRÁFICO REMOVIDA ---
-    // A lógica foi movida para 'data.php' para evitar a condição de corrida
-    /*
-    case 'chart_data':
-        require 'charts.php';
-        break;
-    */
     case 'notifications':
         require 'notifications.php';
         break;
-    // --- FIM DAS ROTAS CORRIGIDAS ---
-
-    // --- ROTAS DE GESTÃO DE GRUPO ---
     case 'members':
         require 'members.php';
         break;
     case 'create_token':
         require 'create_token.php';
         break;
-    // --- FIM DAS ROTAS ADICIONADAS ---
+
+    // --- MÓDULO FINANCEIRO EMPRESARIAL ---
+    case 'financeiro':
+        if (!$group_id) {
+            http_response_code(401);
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'error', 'message' => 'Não autorizado.']);
+            exit;
+        }
+        header('Content-Type: application/json');
+        require 'financeiro.php';
+        break;
+    // --- FIM DO MÓDULO FINANCEIRO ---
+
     default:
-        http_response_code(404); // Not Found
+        http_response_code(404);
         header('Content-Type: application/json');
         echo json_encode(['status' => 'error', 'message' => 'Ação desconhecida.']);
         break;
