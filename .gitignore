@@ -1,0 +1,30 @@
+# Logs
+*.log
+logs/
+
+# Variáveis de ambiente e credenciais
+.env
+.env.local
+.env.production
+
+# Dependências
+vendor/
+node_modules/
+
+# Cache e temporários
+*.cache
+tmp/
+temp/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads de usuários (não versionar arquivos de dados)
+uploads/
