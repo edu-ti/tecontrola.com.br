@@ -1,0 +1,260 @@
+/* ============================================================
+   TeControla - Módulo Finanças Empresarial
+   ============================================================ */
+
+/* Tabs */
+.financas-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border: 2px solid #3b82f6;
+  border-radius: 8px;
+  background: transparent;
+  color: #3b82f6;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Cards de Resumo */
+.financas-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border-left: 4px solid #94a3b8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+}
+
+.summary-card span {
+  display: block;
+  font-size: 0.82em;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.summary-card strong {
+  font-size: 1.3em;
+  color: #1e293b;
+}
+
+.summary-card.income  { border-left-color: #22c55e; }
+.summary-card.expense { border-left-color: #ef4444; }
+.summary-card.balance.positive { border-left-color: #3b82f6; }
+.summary-card.balance.negative { border-left-color: #f97316; }
+
+/* Tabela */
+.financas-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+  margin-top: 20px;
+  overflow-x: auto;
+  display: block;
+}
+
+.financas-table thead th {
+  background: #1e293b;
+  color: #fff;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.financas-table tbody tr:nth-child(even) {
+  background: #f1f5f9;
+}
+
+.financas-table tbody td {
+  padding: 9px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.row-positive td:last-child { color: #16a34a; font-weight: 600; }
+.row-negative td:last-child { color: #dc2626; font-weight: 600; }
+
+/* Metas */
+.goal-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.goal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.goal-header h4 {
+  flex: 1;
+  margin: 0;
+  font-size: 1em;
+}
+
+.goal-type { font-size: 1.4em; }
+
+.goal-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1em;
+  padding: 4px;
+}
+
+.goal-progress span {
+  font-size: 0.82em;
+  color: #475569;
+}
+
+.goal-card small {
+  display: block;
+  margin-top: 8px;
+  color: #64748b;
+  font-size: 0.8em;
+}
+
+/* Progress Bar */
+.progress-bar {
+  background: #e2e8f0;
+  border-radius: 99px;
+  height: 8px;
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, #3b82f6);
+  border-radius: 99px;
+  transition: width 0.4s ease;
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.modal.hidden { display: none; }
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  padding: 28px;
+  width: 90%;
+  max-width: 460px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+.modal-content h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #1e293b;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.9em;
+  color: #374151;
+}
+
+.modal-content input,
+.modal-content select {
+  display: block;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95em;
+  box-sizing: border-box;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+/* Buttons */
+.btn-primary {
+  padding: 9px 20px;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover { background: #2563eb; }
+
+.btn-secondary {
+  padding: 9px 20px;
+  background: #f1f5f9;
+  color: #374151;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Estados */
+.loading { color: #64748b; font-style: italic; }
+.error   { color: #dc2626; }
+
+/* DRE Year Input */
+.dre-header { margin-bottom: 16px; }
+.dre-header input {
+  width: 90px;
+  padding: 6px 8px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  margin-left: 6px;
+}
+
+/* Responsivo */
+@media (max-width: 600px) {
+  .financas-summary { grid-template-columns: 1fr; }
+  .financas-tabs { gap: 6px; }
+  .tab-btn { font-size: 0.82em; padding: 7px 12px; }
+}
