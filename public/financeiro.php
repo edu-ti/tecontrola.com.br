@@ -5,7 +5,7 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['group_id'])) {
     exit;
 }
 
-require_once 'db_config.php';
+require_once '../config/db.php';
 
 $stmt = $pdo->prepare("SELECT group_type, show_financial_projection FROM `groups` WHERE id = ?");
 $stmt->execute([$_SESSION['group_id']]);

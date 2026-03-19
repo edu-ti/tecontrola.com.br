@@ -4,6 +4,7 @@
 // Usa as variáveis globais $pdo e $group_id definidas pelo router.php
 
 global $pdo, $group_id;
+requireAuth();
 
 $method  = $_SERVER['REQUEST_METHOD'];
 $action  = $_GET['subaction'] ?? 'projecao'; // sub-ação: projecao | dre

@@ -3,6 +3,7 @@
 // A sessão, $pdo, $group_id, e $user_role já foram definidos em router.php
 
 // Apenas admins de grupo podem criar tokens de convite
+requireAuth();
 if ($user_role !== 'admin') {
     http_response_code(403); // Forbidden
     echo json_encode(['status' => 'error', 'message' => 'Apenas administradores do grupo podem criar convites.']);

@@ -34,7 +34,7 @@ if (extension_loaded('pdo_mysql')) {
 echo "<h2>3. Teste de Conexão com a Base de Dados</h2>";
 
 // Inclui as credenciais do seu ficheiro de configuração
-require_once 'db_config.php';
+require_once '../config/db.php';
 
 // A variável $pdo é definida no db_config.php. Vamos verificar se foi criada.
 if (isset($pdo) && $pdo instanceof PDO) {

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'env.php';
+require_once '../config/env.php';
 
 // --- CONFIGURAÇÃO DE SEGURANÇA ---
 define('SUPER_ADMIN_PASSWORD', $_ENV['SUPER_ADMIN_PASSWORD'] ?? 'g3st@03Du4rd0');
@@ -63,7 +63,7 @@ if ($is_logged_in && isset($_POST['group_name'])) {
         $error = 'Token CSRF inválido!';
     } else {
         try {
-            require_once 'db_config.php';
+            require_once '../config/db.php';
 
         $group_name = trim($_POST['group_name']);
         $group_type = ($_POST['group_type'] ?? 'pessoal') === 'empresa' ? 'empresa' : 'pessoal';

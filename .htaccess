@@ -5,6 +5,12 @@ RewriteEngine On
     Require all denied
 </FilesMatch>
 
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^(.*)$ index.php [L]
+# Direciona tudo para public/ exceto chamadas diretas para /api/
+RewriteCond %{REQUEST_URI} !^/?api/
+RewriteCond %{REQUEST_URI} !^/?public/
+RewriteRule ^(.*)$ public/$1 [L]
+
+RewriteCond %{REQUEST_URI} ^/?public/
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-f
+RewriteCond %{DOCUMENT_ROOT}%{REQUEST_URI} !-d
+RewriteRule ^public/(.*)$ public/index.php [L]

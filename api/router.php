@@ -20,7 +20,8 @@ if (!$action) {
 
 // A configuração da base de dados é necessária para todas as ações
 try {
-    require_once __DIR__ . '/../db_config.php';
+    require_once __DIR__ . '/../config/db.php';
+    require_once __DIR__ . '/../app/helpers/auth.php';
 } catch (PDOException $e) {
     http_response_code(500);
     header('Content-Type: application/json');

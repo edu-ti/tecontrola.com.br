@@ -3,6 +3,7 @@
 // A sessão e a ligação à base de dados são tratadas pelo router.php.
 
 global $pdo, $group_id; // Usa as variáveis globais definidas no router
+requireAuth();
 
 $method = $_SERVER['REQUEST_METHOD'];
 

@@ -3,6 +3,7 @@
 // A sessão, $pdo, $group_id, $user_id e $user_role já foram definidos em router.php
 
 $method = $_SERVER['REQUEST_METHOD'];
+requireAuth();
 
 // Apenas admins de grupo podem gerir membros
 if ($user_role !== 'admin') {
