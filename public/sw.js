@@ -52,17 +52,24 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Estratégia de cache para outros pedidos
+  // Estratégia Network First, caindo para Cache se offline
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      // Se o recurso estiver em cache, retorna-o
-      if (response) {
-        return response;
-      }
-      
-      // Caso contrário, tenta buscar na rede
-      return fetch(event.request).catch(() => {
-        // Se a busca na rede falhar, retorna a página de fallback offline
+    fetch(event.request).then((networkResponse) => {
+      // Se tiver sucesso na rede, atualiza o cache
+      return caches.open(CACHE_NAME).then((cache) => {
+        // Ignora cache para requisições que não sejam GET
+        if (event.request.method === 'GET') {
+          cache.put(event.request, networkResponse.clone());
+        }
+        return networkResponse;
+      });
+    }).catch(() => {
+      // Se falhar a rede (offline), busca no cache
+      return caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        // Se não tiver em cache e for navegação, exibe offline.html
         if (event.request.mode === 'navigate') {
           return caches.match(OFFLINE_FALLBACK_PAGE);
         }
