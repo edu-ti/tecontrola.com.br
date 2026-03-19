@@ -12,8 +12,10 @@ O sistema evoluiu para um modelo Multi-Tenant/SaaS utilizando Asaas para o proce
 ## ⚙️ Instalação / Deployment
 1. Suba todos os diretórios no servidor, certificando-se de apontar o `DocumentRoot` (Apache/Nginx) preferencialmente para o sub-diretório `/public` (ou caso use a raiz do projeto, confie no arquivo `.htaccess` mantido na raiz para redirecionamento silencioso).
 2. Verifique o arquivo `u540193243_te_controla_db.sql` e insira no seu SQL remoto.
-3. Importante: Não se esqueça de correr o script da respectiva pasta `/migrations/002_saas_subscription.sql` para modernizar seu banco com as colunas de assinantes!
-4. Renomeie o arquivo `.env.example` para `.env` e defina suas senhas, portas DB, e configurações (o parser de ambientes nativo e exclusivo do projeto irá lidar magicamente com essas lógicas para a `$_ENV`), protegendo as credenciais fora do histórico do repositório.
+3. Renomeie o arquivo `.env.example` para `.env` e defina suas senhas, portas DB, e configurações (o parser de ambientes nativo e exclusivo do projeto irá lidar magicamente com essas lógicas para a `$_ENV`), protegendo as credenciais fora do histórico do repositório.
+
+### Banco de Dados (SaaS)
+Após importar o banco inicial, é obrigatório executar a migration `migrations/2026_03_19_add_business_flags_to_groups.sql` no seu banco de dados. Essa migration moderniza as tabelas com as colunas de assinantes, status da conta (Trial, Bloqueado) e histórico de pagamentos do Asaas!
 
 ### Asaas Settings
 Defina as credenciais do Asaas no próprio arquivo `.env` sem aspas ou complicações (conforme exemplo em `.env.example`).
