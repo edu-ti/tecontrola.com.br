@@ -1,6 +1,6 @@
 <?php
 // Inclui o arquivo de configuração do banco de dados
-require_once 'db_config.php';
+require_once '../config/db.php';
 
 // Gera um token único e seguro
 $token = bin2hex(random_bytes(16));
@@ -22,4 +22,3 @@ try {
     echo "<p>Não foi possível inserir a chave no banco de dados. Verifique a conexão e a estrutura da tabela.</p>";
     echo "<p>Erro: " . $e->getMessage() . "</p>";
 }
-?>
