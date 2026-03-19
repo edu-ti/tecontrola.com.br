@@ -24,6 +24,11 @@ if ($method === 'GET') {
     $current_month_date = "$year-$month-01";
 
     try {
+        // Buscar Configurações do Grupo
+        $stmt = $pdo->prepare("SELECT id, name, group_type, show_financial_projection FROM `groups` WHERE id = ?");
+        $stmt->execute([$group_id]);
+        $data['group_settings'] = $stmt->fetch(PDO::FETCH_ASSOC);
+
         // Buscar Categorias
         $stmt = $pdo->prepare("SELECT * FROM categories WHERE group_id = ? ORDER BY name ASC");
         $stmt->execute([$group_id]);

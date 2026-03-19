@@ -111,7 +111,32 @@ if ($is_logged_in && isset($_POST['group_name'])) {
                 <form method="POST" action="admin.php">
                     <label for="group_name">Nome do Grupo (ex: Família de João):</label>
                     <input type="text" id="group_name" name="group_name" required>
+                    
+                    <label for="group_type">Tipo de Grupo:</label>
+                    <select id="group_type" name="group_type" onchange="toggleProjectionField()" style="margin-bottom: 1rem; width: 100%; padding: 0.5rem; border-radius: 4px; border: 1px solid #ccc;">
+                        <option value="pessoal">Pessoal / Familiar</option>
+                        <option value="empresa">Empresa</option>
+                    </select>
+
+                    <div id="projection_container" style="display: none; margin-bottom: 1rem; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" id="show_financial_projection" name="show_financial_projection" value="1" style="width: auto; margin: 0;">
+                        <label for="show_financial_projection" style="display: inline;">Habilitar Módulo de Projeção Financeira</label>
+                    </div>
+
                     <button type="submit">Criar Grupo e Gerar Token</button>
+
+                    <script>
+                        function toggleProjectionField() {
+                            const type = document.getElementById('group_type').value;
+                            const container = document.getElementById('projection_container');
+                            if (type === 'empresa') {
+                                container.style.display = 'flex';
+                            } else {
+                                container.style.display = 'none';
+                                document.getElementById('show_financial_projection').checked = false;
+                            }
+                        }
+                    </script>
                 </form>
 
                 <?php if ($error): ?>

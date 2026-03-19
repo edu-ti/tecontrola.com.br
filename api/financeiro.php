@@ -13,6 +13,18 @@ function financeiro_error($message = 'Erro desconhecido.') {
     exit;
 }
 
+$stmt_group = $pdo->prepare("SELECT group_type, show_financial_projection FROM `groups` WHERE id = ?");
+$stmt_group->execute([$group_id]);
+$group_settings = $stmt_group->fetch(PDO::FETCH_ASSOC);
+
+if (!$group_settings || $group_settings['group_type'] !== 'empresa' || (int)$group_settings['show_financial_projection'] !== 1) {
+    echo json_encode([
+        'status' => 'error',
+        'message' => 'Módulo financeiro empresarial não habilitado para este grupo.'
+    ]);
+    exit;
+}
+
 if ($method === 'GET') {
     $year = isset($_GET['year'])  ? (int)$_GET['year']  : (int)date('Y');
 

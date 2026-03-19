@@ -1,7 +1,18 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || !isset($_SESSION['group_id'])) {
     header('Location: default.php');
+    exit;
+}
+
+require_once 'db_config.php';
+
+$stmt = $pdo->prepare("SELECT group_type, show_financial_projection FROM `groups` WHERE id = ?");
+$stmt->execute([$_SESSION['group_id']]);
+$group = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$group || $group['group_type'] !== 'empresa' || (int)$group['show_financial_projection'] !== 1) {
+    header('Location: index.php');
     exit;
 }
 ?>

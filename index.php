@@ -82,6 +82,12 @@ $user_role = $is_logged_in ? $_SESSION['user_role'] : 'membro';
                 <div class="flex items-center space-x-3">
                     <span class="text-gray-600 mr-2 text-sm hidden sm:block">Olá, <?php echo htmlspecialchars($user_name); ?></span>
                     
+                    <!-- Botão Projeção Financeira -->
+                    <a x-cloak x-show="data.group_settings && data.group_settings.group_type === 'empresa' && Number(data.group_settings.show_financial_projection) === 1" href="financeiro.php" class="bg-emerald-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 transition duration-200 text-sm font-semibold flex items-center space-x-2">
+                        <i class="fas fa-chart-line"></i>
+                        <span class="hidden sm:inline">Projeção Financeira</span>
+                    </a>
+
                     <!-- Botão de Gerir Membros (Apenas para Admins) -->
                     <button x-show="userRole === 'admin'" @click="openManageMembersModal()" class="bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-indigo-700 transition duration-200 text-sm font-semibold flex items-center space-x-2">
                         <i class="fas fa-users"></i>
