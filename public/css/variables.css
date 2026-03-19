@@ -1,0 +1,14 @@
+:root {
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --secondary: #475569;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --background: #f8fafc;
+  --surface: #ffffff;
+}
+
+body {
+  background-color: var(--background);
+}

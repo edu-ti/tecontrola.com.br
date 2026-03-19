@@ -1,5 +1,13 @@
 <?php
 session_start();
+
+$group_sub_status = 'active';
+if (isset($_SESSION['group_id'])) {
+    require_once '../config/db.php';
+    require_once '../app/helpers/access_guard.php';
+    $group_sub_status = checkAccess($_SESSION['group_id'], $pdo);
+}
+
 $is_logged_in = isset($_SESSION['user_id']);
 $user_name = $is_logged_in ? $_SESSION['user_name'] : '';
 // Passa a função do utilizador para o JavaScript
@@ -27,6 +35,7 @@ $user_role = $is_logged_in ? $_SESSION['user_role'] : 'membro';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>!-->
     
+    <link rel="stylesheet" href="css/variables.css">
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 </head>
@@ -36,37 +45,95 @@ $user_role = $is_logged_in ? $_SESSION['user_role'] : 'membro';
     <input type="hidden" id="userRole" value="<?php echo htmlspecialchars($user_role); ?>">
 
     <!-- Auth Container -->
-    <div x-data="{ showLogin: true }" x-show="!<?php echo $is_logged_in ? 'true' : 'false'; ?>" class="min-h-screen flex items-center justify-center bg-gray-100 p-4" x-cloak>
-        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md text-center">
+    <div x-data="{ showLogin: true, 
+                   regPassword: '', 
+                   passwordStrength() {
+                       let s = 0; 
+                       if(this.regPassword.length > 5) s+=1; 
+                       if(/[A-Z]/.test(this.regPassword)) s+=1; 
+                       if(/[0-9]/.test(this.regPassword)) s+=1; 
+                       return s; 
+                   } 
+                 }" 
+         x-show="!<?php echo $is_logged_in ? 'true' : 'false'; ?>" class="min-h-screen flex items-center justify-center bg-gray-100 p-4" x-cloak>
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
             
             <!-- Logótipo Centralizado -->
             <div class="flex justify-center mb-6">
                 <img src="./imagens/logo.png" alt="Te Controla Logotipo" class="h-28">
             </div>
             
-            <h2 x-show="showLogin" class="text-3xl font-bold text-gray-800 mb-6">Login</h2>
-            <h2 x-show="!showLogin" class="text-3xl font-bold text-gray-800 mb-6">Cadastro</h2>
+            <!-- Tabs Visuais -->
+            <div class="flex border-b mb-6 border-gray-200">
+                <button @click="showLogin = true" :class="showLogin ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="w-1/2 py-2 text-center border-b-2 font-semibold transition-colors duration-200 focus:outline-none">Login</button>
+                <button @click="showLogin = false" :class="!showLogin ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'" class="w-1/2 py-2 text-center border-b-2 font-semibold transition-colors duration-200 focus:outline-none">Cadastro</button>
+            </div>
 
             <!-- Formulário de Login -->
-            <div id="login-form-container" x-show="showLogin">
+            <div id="login-form-container" x-show="showLogin" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
                 <form id="login-form">
-                    <div class="mb-4 text-left"><label for="login-email" class="block text-gray-600 mb-2">Email</label><input type="email" id="login-email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></div>
-                    <div class="mb-6 text-left"><label for="login-password" class="block text-gray-600 mb-2">Senha</label><input type="password" id="login-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></div>
-                    <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition duration-200 font-semibold">Entrar</button>
+                    <div class="mb-4 text-left">
+                        <label for="login-email" class="block text-gray-600 mb-1 text-sm font-medium">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                            <input type="email" id="login-email" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" required placeholder="seu@email.com">
+                        </div>
+                    </div>
+                    <div class="mb-6 text-left">
+                        <label for="login-password" class="block text-gray-600 mb-1 text-sm font-medium">Senha</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                            <input type="password" id="login-password" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50" required placeholder="••••••••">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-200 font-bold shadow-md">Entrar na Conta</button>
                 </form>
-                <p class="text-center text-sm text-gray-500 mt-6">Não tem uma conta? <a href="#" id="show-register" @click.prevent="showLogin = false" class="text-blue-600 hover:underline">Cadastre-se</a></p>
             </div>
 
             <!-- Formulário de Cadastro -->
-            <div id="register-form-container" x-show="!showLogin">
+            <div id="register-form-container" x-show="!showLogin" style="display: none;" x-transition:enter="transition ease-out duration-300 transform" x-transition:enter-start="opacity-0 translate-y-4" x-transition:enter-end="opacity-100 translate-y-0">
                 <form id="register-form">
-                    <div class="mb-4 text-left"><label for="register-name" class="block text-gray-600 mb-2">Nome</label><input type="text" id="register-name" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required></div>
-                    <div class="mb-4 text-left"><label for="register-email" class="block text-gray-600 mb-2">Email</label><input type="email" id="register-email" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required></div>
-                    <div class="mb-4 text-left"><label for="register-password" class="block text-gray-600 mb-2">Senha</label><input type="password" id="register-password" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" required></div>
-                    <div class="mb-6 text-left"><label for="register-token" class="block text-gray-600 mb-2">Chave de Cadastro (Token)</label><input type="text" id="register-token" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Insira a chave recebida" required></div>
-                    <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition duration-200 font-semibold">Criar Conta</button>
+                    <div class="mb-4 text-left">
+                        <label for="register-name" class="block text-gray-600 mb-1 text-sm font-medium">Nome Completo</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="register-name" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" required placeholder="João da Silva">
+                        </div>
+                    </div>
+                    <div class="mb-4 text-left">
+                        <label for="register-email" class="block text-gray-600 mb-1 text-sm font-medium">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-3 top-3 text-gray-400"></i>
+                            <input type="email" id="register-email" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" required placeholder="seu@email.com">
+                        </div>
+                    </div>
+                    <div class="mb-4 text-left">
+                        <label for="register-password" class="block text-gray-600 mb-1 text-sm font-medium">Senha</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                            <input type="password" x-model="regPassword" id="register-password" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" required placeholder="Mínimo 6 caracteres">
+                        </div>
+                        <!-- Indicador de Força da Senha -->
+                        <div class="mt-2" x-show="regPassword.length > 0">
+                            <div class="flex h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                                <div class="h-full transition-all duration-300" 
+                                     :class="{'w-1/3 bg-red-500': passwordStrength() === 1, 
+                                              'w-2/3 bg-yellow-500': passwordStrength() === 2, 
+                                              'w-full bg-green-500': passwordStrength() >= 3,
+                                              'w-0': passwordStrength() === 0}"></div>
+                            </div>
+                            <p class="text-xs mt-1" :class="{'text-red-500': passwordStrength() === 1, 'text-yellow-600': passwordStrength() === 2, 'text-green-600': passwordStrength() >= 3}" x-text="['Muito fraca', 'Fraca', 'Média', 'Forte'][passwordStrength()]"></p>
+                        </div>
+                    </div>
+                    <div class="mb-6 text-left">
+                        <label for="register-token" class="block text-gray-600 mb-1 text-sm font-medium">Chave de Convite (Token)</label>
+                        <div class="relative">
+                            <i class="fas fa-key absolute left-3 top-3 text-gray-400"></i>
+                            <input type="text" id="register-token" class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-gray-50" placeholder="Token fornecido pelo Admin" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-200 font-bold shadow-md">Criar Minha Conta</button>
                 </form>
-                <p class="text-center text-sm text-gray-500 mt-6">Já tem uma conta? <a href="#" id="show-login" @click.prevent="showLogin = true" class="text-green-600 hover:underline">Faça Login</a></p>
             </div>
         </div>
     </div>
@@ -137,6 +204,13 @@ $user_role = $is_logged_in ? $_SESSION['user_role'] : 'membro';
         </header>
 
         <main class="container mx-auto p-4 sm:p-6">
+            <?php if ($group_sub_status === 'overdue'): ?>
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 mb-6 rounded shadow-sm">
+                <p class="font-bold flex items-center"><i class="fas fa-exclamation-triangle mr-2"></i> Atenção: Pagamento Pendente!</p>
+                <p class="text-sm mt-1">Identificamos que o pagamento da sua assinatura está em atraso. O acesso será bloqueado em breve se não for regularizado.</p>
+            </div>
+            <?php endif; ?>
+            
             <!-- Header -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                <!-- Seletor de Mês/Ano -->

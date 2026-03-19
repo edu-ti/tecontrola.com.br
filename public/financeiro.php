@@ -6,6 +6,9 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['group_id'])) {
 }
 
 require_once '../config/db.php';
+require_once '../app/helpers/access_guard.php';
+
+$group_sub_status = checkAccess($_SESSION['group_id'], $pdo);
 
 $stmt = $pdo->prepare("SELECT group_type, show_financial_projection FROM `groups` WHERE id = ?");
 $stmt->execute([$_SESSION['group_id']]);
@@ -23,6 +26,9 @@ if (!$group || $group['group_type'] !== 'empresa' || (int)$group['show_financial
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Projeção Financeira - TeControla</title>
 <link rel="stylesheet" href="css/style.css">
+    <!--<script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>!-->
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
@@ -77,6 +83,13 @@ if (!$group || $group['group_type'] !== 'empresa' || (int)$group['show_financial
 </style>
 </head>
 <body>
+
+<?php if ($group_sub_status === 'overdue'): ?>
+<div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 p-4 text-center text-sm shadow-sm z-50 relative">
+    <p class="font-bold"><i class="fas fa-exclamation-triangle mr-1"></i> Atenção: Pagamento Pendente!</p>
+    <p>A sua assinatura está em atraso. Regularize para não perder acesso à plataforma.</p>
+</div>
+<?php endif; ?>
 
 <div class="top-bar">
   <h1>📈 Projeção Financeira</h1>

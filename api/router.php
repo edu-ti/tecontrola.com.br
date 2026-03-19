@@ -36,11 +36,29 @@ $user_role = $_SESSION['user_role'] ?? null;
 
 // Verifica autenticação para recursos protegidos
 $public_actions = ['login', 'register'];
-if (!in_array($action, $public_actions) && !$user_id) {
-    http_response_code(401);
-    header('Content-Type: application/json');
-    echo json_encode(['status' => 'error', 'message' => 'Não autenticado.']);
-    exit;
+if (!in_array($action, $public_actions)) {
+    if (!$user_id) {
+        http_response_code(401);
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'error', 'message' => 'Não autenticado.']);
+        exit;
+    }
+    
+    // Check SaaS subscription block status
+    if ($group_id) {
+        require_once __DIR__ . '/../app/helpers/access_guard.php';
+        $status = checkSubscriptionStatus($group_id, $pdo);
+        if ($status) {
+            $subStatus = $status['subscription_status'];
+            $trialEnds = $status['trial_ends_at'];
+            if ($subStatus === 'blocked' || ($subStatus === 'trial' && $trialEnds && strtotime($trialEnds) < time())) {
+                http_response_code(403);
+                header('Content-Type: application/json');
+                echo json_encode(['status' => 'error', 'message' => 'Assinatura suspensa']);
+                exit;
+            }
+        }
+    }
 }
 
 // Roteia a ação para o ficheiro PHP correspondente
