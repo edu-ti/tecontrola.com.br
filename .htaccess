@@ -1,4 +1,10 @@
 RewriteEngine On
+
+# Bloquear acesso a arquivos sensíveis
+<FilesMatch "\.(env|sql)$|diagnostico\.php$">
+    Require all denied
+</FilesMatch>
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ index.php [L]

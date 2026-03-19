@@ -1,38 +1,69 @@
 <?php
 session_start();
+require_once 'env.php';
 
 // --- CONFIGURAÇÃO DE SEGURANÇA ---
-// Defina aqui a sua senha de Super Admin.
-// MUDE ISTO PARA ALGO MUITO SEGURO!
-define('SUPER_ADMIN_PASSWORD', 'g3st@03Du4rd0');
+define('SUPER_ADMIN_PASSWORD', $_ENV['SUPER_ADMIN_PASSWORD'] ?? 'g3st@03Du4rd0');
 // --- FIM DA CONFIGURAÇÃO ---
 
 $error = '';
 $success = '';
 $is_logged_in = (isset($_SESSION['super_admin_logged_in']) && $_SESSION['super_admin_logged_in'] === true);
 
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = 0;
+}
+
+if (isset($_SESSION['lockout_time']) && time() < $_SESSION['lockout_time']) {
+    $remaining_lockout = ceil(($_SESSION['lockout_time'] - time()) / 60);
+    $error = "Muitas tentativas falhadas. Tente novamente em {$remaining_lockout} minutos.";
+} elseif (isset($_SESSION['lockout_time']) && time() >= $_SESSION['lockout_time']) {
+    unset($_SESSION['lockout_time']);
+    $_SESSION['login_attempts'] = 0;
+}
+
 // Lógica de Login
-if (isset($_POST['password'])) {
-    if ($_POST['password'] === SUPER_ADMIN_PASSWORD) {
-        $_SESSION['super_admin_logged_in'] = true;
-        $is_logged_in = true;
+if (isset($_POST['password']) && !$is_logged_in && empty($error)) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = 'Token CSRF inválido!';
     } else {
-        $error = 'Senha incorreta!';
+        if (hash_equals(SUPER_ADMIN_PASSWORD, $_POST['password'])) {
+            session_regenerate_id(true);
+            $_SESSION['super_admin_logged_in'] = true;
+            $_SESSION['login_attempts'] = 0;
+            $is_logged_in = true;
+        } else {
+            $_SESSION['login_attempts']++;
+            if ($_SESSION['login_attempts'] >= 5) {
+                $_SESSION['lockout_time'] = time() + (10 * 60);
+                $error = 'Muitas tentativas falhadas. Login bloqueado por 10 minutos.';
+            } else {
+                $error = 'Senha incorreta!';
+            }
+        }
     }
 }
 
 // Lógica de Logout
 if (isset($_GET['logout'])) {
     unset($_SESSION['super_admin_logged_in']);
+    session_regenerate_id(true);
     $is_logged_in = false;
     header('Location: admin.php');
     exit;
 }
 
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
 // Lógica de Criação de Grupo
 if ($is_logged_in && isset($_POST['group_name'])) {
-    try {
-        require_once 'db_config.php';
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        $error = 'Token CSRF inválido!';
+    } else {
+        try {
+            require_once 'db_config.php';
 
         $group_name = trim($_POST['group_name']);
         $group_type = ($_POST['group_type'] ?? 'pessoal') === 'empresa' ? 'empresa' : 'pessoal';
@@ -66,11 +97,12 @@ if ($is_logged_in && isset($_POST['group_name'])) {
             $success = "Grupo '<strong>" . htmlspecialchars($group_name) . "</strong>' criado com sucesso!<br>
             Token de Administrador:<br><strong class='token'>" . htmlspecialchars($token) . "</strong>";
         }
-    } catch (PDOException $e) {
-        if ($pdo->inTransaction()) {
+      } catch (PDOException $e) {
+        if (isset($pdo) && $pdo->inTransaction()) {
             $pdo->rollBack();
         }
         $error = "Erro na base de dados: " . $e->getMessage();
+      }
     }
 }
 
@@ -96,6 +128,7 @@ if ($is_logged_in && isset($_POST['group_name'])) {
             <!-- Formulário de Login -->
             <div class="card">
                 <form method="POST" action="admin.php">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     <label for="password">Senha de Acesso:</label>
                     <input type="password" id="password" name="password" required>
                     <button type="submit">Entrar</button>
@@ -109,6 +142,7 @@ if ($is_logged_in && isset($_POST['group_name'])) {
             <div class="card">
                 <h2 class="card-title">Criar Novo Grupo de Clientes</h2>
                 <form method="POST" action="admin.php">
+                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
                     <label for="group_name">Nome do Grupo (ex: Família de João):</label>
                     <input type="text" id="group_name" name="group_name" required>
                     

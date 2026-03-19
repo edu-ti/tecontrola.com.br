@@ -1,4 +1,11 @@
 <?php
+session_start();
+if (empty($_SESSION['super_admin_logged_in'])) {
+    header('HTTP/1.0 403 Forbidden');
+    echo "<h1>403 Forbidden - Acesso Negado</h1>";
+    exit;
+}
+
 // Ativa a exibição de todos os erros para um diagnóstico completo
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

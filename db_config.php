@@ -6,11 +6,13 @@ function hashPassword($password) {
     return password_hash($password, PASSWORD_DEFAULT);
 }
 
+require_once __DIR__ . '/env.php';
+
 // Definições do banco de dados
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'u540193243_te_controla_db');
-define('DB_USER', 'u540193243_te_controla');
-define('DB_PASS', 'g3st@03Du4rd0');
+define('DB_HOST', $_ENV['DB_HOST'] ?? 'localhost');
+define('DB_NAME', $_ENV['DB_NAME'] ?? '');
+define('DB_USER', $_ENV['DB_USER'] ?? '');
+define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 define('DB_CHARSET', 'utf8mb4');
 
 // Data Source Name (DSN)
