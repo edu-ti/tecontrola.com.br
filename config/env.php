@@ -12,5 +12,5 @@ function loadEnv($path) {
     return true;
 }
 
-// Carregar .env a partir do mesmo diretório
-loadEnv(__DIR__ . '/.env');
+// Carregar .env a partir do diretório raiz
+loadEnv(__DIR__ . '/../.env');
