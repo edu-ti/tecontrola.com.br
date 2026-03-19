@@ -17,11 +17,17 @@ O sistema evoluiu para um modelo Multi-Tenant/SaaS utilizando Asaas para o proce
 ### Banco de Dados (SaaS)
 Após importar o banco inicial, é obrigatório executar a migration `migrations/2026_03_19_add_business_flags_to_groups.sql` no seu banco de dados. Essa migration moderniza as tabelas com as colunas de assinantes, status da conta (Trial, Bloqueado) e histórico de pagamentos do Asaas!
 
-### Asaas Settings
-Defina as credenciais do Asaas no próprio arquivo `.env` sem aspas ou complicações (conforme exemplo em `.env.example`).
-Configure o destino do Webhook no seu ambiente de Painel Asaas como `https://seusite.com.br/api/webhook_asaas.php` e assegure-se de injetar a chave Webhook Token.
+### Asaas Settings e Webhooks
+Defina suas chaves no `.env`. Utilize o token do Asaas gerado dentro do painel para o `ASAAS_WEBHOOK_TOKEN` e insira as credenciais da API Asaas. Configure o destino do Webhook no painel do Asaas como `https://tecontrola.com.br/api/webhook_asaas.php`.
+
+**Eventos Obrigatórios no Painel do Asaas:**
+Certifique-se de habilitar e checar todos esses eventos:
+- PAYMENT_CONFIRMED, PAYMENT_RECEIVED, PAYMENT_OVERDUE, PAYMENT_DELETED, PAYMENT_RESTORED
+- SUBSCRIPTION_CREATED, SUBSCRIPTION_RENEWED, SUBSCRIPTION_DELETED
+
+No campo "Token de Acesso" ou secret token das configurações do seu webhook online, insira a mesma hash que você injetou no seu `ASAAS_WEBHOOK_TOKEN` no `.env`.
 
 ### Cron Job Automatizado
-Adicione a seguinte rotina diária no painel da sua hospedagem:
-`0 0 * * * php /caminho/do/projeto/cron/check_subscriptions.php`
+Adicione a seguinte rotina diária no painel do seu CPanel ou Servidor:
+`0 0 * * * php /caminho/absoluto/do/projeto/cron/check_subscriptions.php`
 *(Nota: a execução via navegador é negada por segurança; o script roda exclusivamente CLI para proteger brechas).*
